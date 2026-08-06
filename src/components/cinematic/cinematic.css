@@ -1,0 +1,47 @@
+/* ------------------------------------------------------------------ */
+/*  Cinematic loader / hero styles                                     */
+/*  SplitType internals + fluid editorial heading sizing.              */
+/* ------------------------------------------------------------------ */
+
+/* Each word occupies its own line — the stacked editorial layout.     */
+.loader-word {
+  display: block;
+}
+
+/* Characters animate independently; hints the GPU to keep them        */
+/* composited during the opacity/transform/blur reveal.                */
+.loader-char {
+  display: inline-block;
+  backface-visibility: hidden;
+  will-change: transform, opacity, filter;
+}
+
+/* Fluid editorial heading — scales with the viewport but never gets   */
+/* absurdly large on ultra-wide screens.                               */
+.loader-heading {
+  font-size: clamp(2.5rem, 7vw + 1rem, 7.5rem);
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+}
+
+/* A slower, calmer drift for the ambient light layer.                 */
+.glow-layer {
+  transform: translate3d(0, 0, 0);
+}
+
+/* Hide the scrollbar on the short-screen overflow fallback.          */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Respect reduced motion: fall back to native, no-smoothing behavior. */
+@media (prefers-reduced-motion: reduce) {
+  .loader-word,
+  .loader-char,
+  .glow-layer {
+    will-change: auto;
+  }
+}
