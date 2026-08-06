@@ -47,6 +47,19 @@
   transform: translate3d(0, 0, 0);
 }
 
+/* The kinetic grid background breathes in with the loader sequence.   */
+.kinetic-bg {
+  animation: kinetic-bg-in 2s ease-out forwards;
+}
+@keyframes kinetic-bg-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 /* Hide the scrollbar on the short-screen overflow fallback.          */
 .no-scrollbar {
   scrollbar-width: none;
@@ -61,6 +74,13 @@
   .loader-char,
   .glow-layer {
     will-change: auto;
+  }
+
+  /* Show the grid immediately; the component itself renders a static    */
+  /* frame under reduced motion.                                          */
+  .kinetic-bg {
+    animation: none;
+    opacity: 1;
   }
 }
 

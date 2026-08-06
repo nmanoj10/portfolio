@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import SplitType from "split-type";
 import { cn } from "@/lib/utils";
+import KineticGrid from "@/components/ui/kinetic-grid";
 import { LoaderBackdrop } from "./loader-backdrop";
 import { buildLoaderTimeline } from "@/lib/animations/loader-timeline";
 import { buildIntroTimeline } from "@/lib/animations/intro-timeline";
@@ -154,6 +155,13 @@ export function CinematicLoader({ onComplete, finished = false }: CinematicLoade
       )}
     >
       <LoaderBackdrop ref={backdropRef} />
+
+      {/* Interactive kinetic-grid background — warps toward the pointer,
+          ripples on click. Fades in with the loader sequence. */}
+      <KineticGrid
+        globalColor="monochrome"
+        className="kinetic-bg absolute inset-0 z-0 min-h-0"
+      />
 
       {/* ---------- Hero navigation ---------- */}
       <nav
