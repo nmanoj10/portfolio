@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { CinematicLoader } from "./components/cinematic/cinematic-loader";
 import { CinematicFooter } from "./components/ui/motion-footer";
+import TechStack from "./components/ui/tech";
 import { useLenis } from "./hooks/use-lenis";
 
 function App() {
@@ -33,9 +34,14 @@ function App() {
       {/* The cinematic footer only enters AFTER the loader has finished,
           so it never sits on top of the loader. */}
       {ready && (
-        <div className="animate-footer-enter relative z-40">
-          <CinematicFooter />
-        </div>
+        <>
+          <div className="relative z-40">
+            <TechStack />
+          </div>
+          <div className="animate-footer-enter relative z-40">
+            <CinematicFooter />
+          </div>
+        </>
       )}
     </div>
   );

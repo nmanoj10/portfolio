@@ -116,13 +116,14 @@ const STYLES = `
 
 /* Giant Background Text Masking */
 .footer-giant-bg-text {
-  font-size: 26vw;
+  font-size: 18vw;
   line-height: 0.75;
   font-weight: 900;
   letter-spacing: -0.05em;
+  opacity: 0.7;
   color: transparent;
-  -webkit-text-stroke: 1px color-mix(in oklch, var(--foreground) 5%, transparent);
-  background: linear-gradient(180deg, color-mix(in oklch, var(--foreground) 10%, transparent) 0%, transparent 60%);
+  -webkit-text-stroke: 1px color-mix(in oklch, var(--foreground) 15%, transparent);
+  background: linear-gradient(180deg, color-mix(in oklch, var(--foreground) 20%, transparent) 0%, transparent 85%);
   -webkit-background-clip: text;
   background-clip: text;
 }
@@ -354,7 +355,7 @@ export function CinematicFooter() {
             ref={giantTextRef}
             className="cinematic-footer-giant-text footer-giant-bg-text absolute -bottom-[5vh] left-1/2 -translate-x-1/2 whitespace-nowrap z-0 pointer-events-none select-none"
           >
-            SOBERS
+            INNOVATE
           </div>
 
           {/* 1. Diagonal Sleek Marquee (Top of footer) */}
