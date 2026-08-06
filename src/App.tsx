@@ -37,6 +37,7 @@ function App() {
         <>
           <div className="relative z-40">
             <TechStack />
+           
           </div>
           <div className="animate-footer-enter relative z-40">
             <CinematicFooter />
