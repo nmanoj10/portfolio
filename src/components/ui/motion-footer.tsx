@@ -5,6 +5,7 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { cn } from "@/lib/utils";
+import { Mail, FileText } from "lucide-react";
 
 // Register ScrollTrigger safely for React
 if (typeof window !== "undefined") {
@@ -27,11 +28,11 @@ const STYLES = `
   --pill-shadow: color-mix(in oklch, var(--background) 50%, transparent);
   --pill-highlight: color-mix(in oklch, var(--foreground) 10%, transparent);
   --pill-inset-shadow: color-mix(in oklch, var(--background) 80%, transparent);
-  --pill-border: color-mix(in oklch, var(--foreground) 8%, transparent);
+  --pill-border: color-mix(in oklch, var(--foreground) 16%, transparent);
   
   --pill-bg-1-hover: color-mix(in oklch, var(--foreground) 8%, transparent);
   --pill-bg-2-hover: color-mix(in oklch, var(--foreground) 2%, transparent);
-  --pill-border-hover: color-mix(in oklch, var(--foreground) 20%, transparent);
+  --pill-border-hover: color-mix(in oklch, var(--foreground) 35%, transparent);
   --pill-shadow-hover: color-mix(in oklch, var(--background) 70%, transparent);
   --pill-highlight-hover: color-mix(in oklch, var(--foreground) 20%, transparent);
 }
@@ -370,38 +371,73 @@ export function CinematicFooter() {
               ref={headingRef}
               className="cinematic-footer-heading text-4xl sm:text-6xl md:text-8xl font-black footer-text-glow tracking-tighter mb-8 md:mb-12 text-center"
             >
-             Let's Build ?
+              Let's Build ?
             </h2>
 
             {/* Interactive Magnetic Pills Layout */}
             <div ref={linksRef} className="cinematic-footer-pills flex flex-col items-center gap-6 w-full">
-              {/* App Store Links (Primary) */}
+              {/* Contact Links (Primary) */}
               <div className="flex flex-wrap justify-center gap-3 md:gap-4 w-full">
-                <MagneticButton as="a" href="#" className="footer-glass-pill px-6 py-4 sm:px-10 sm:py-5 rounded-full text-foreground font-bold text-sm md:text-base flex items-center gap-3 group">
-                  <svg className="w-5 h-5 sm:w-6 sm:h-6 text-muted-foreground group-hover:text-foreground transition-colors" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.04 2.26-.79 3.59-.76 1.56.04 2.87.67 3.55 1.76-3.13 1.77-2.62 5.92.35 7.14-.65 1.58-1.57 3.1-2.57 4.03zm-3.21-14.7c-.55 1.4-1.89 2.37-3.25 2.28.09-1.5 1.05-2.82 2.38-3.4 1.25-.57 2.66-.41 3.25.04-.15.35-.26.72-.38 1.08z" />
-                  </svg>
-                  Download iOS
+                <MagneticButton
+                  as="a"
+                  href="mailto:nagenahallaimanoj@gmail.com?subject=Portfolio%20Inquiry&body=Hi%20Manoj,%0A%0AI%20visited%20your%20portfolio%20and%20would%20like%20to%20connect%20with%20you."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="footer-glass-pill px-6 py-4 sm:px-10 sm:py-5 rounded-full text-muted-foreground hover:text-white font-bold text-sm md:text-base flex items-center gap-3 group transition-colors"
+                >
+                  <Mail className="h-5 w-5 text-muted-foreground group-hover:text-white transition-colors" />
+                  <span>Email Me</span>
                 </MagneticButton>
 
-                <MagneticButton as="a" href="#" className="footer-glass-pill px-6 py-4 sm:px-10 sm:py-5 rounded-full text-foreground font-bold text-sm md:text-base flex items-center gap-3 group">
-                  <svg className="w-5 h-5 sm:w-6 sm:h-6 text-muted-foreground group-hover:text-foreground transition-colors" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993.0004.5511-.4482.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993.0004.5511-.4482.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0222 3.503C15.5902 8.242 13.8533 7.85 12 7.85c-1.8533 0-3.5902.392-5.1369 1.1004L4.841 5.4475a.416.416 0 00-.5676-.1521.416.416 0 00-.1521.5676l1.9973 3.4592C2.6889 11.1867.3432 14.6589 0 18.761h24c-.3436-4.1021-2.6893-7.5743-6.1185-9.4396" />
+                <MagneticButton
+                  as="a"
+                  href="https://wa.me/7892531958"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="footer-glass-pill px-6 py-4 sm:px-10 sm:py-5 rounded-full text-muted-foreground hover:text-white font-bold text-sm md:text-base flex items-center gap-3 group transition-colors"
+                >
+                  <svg className="w-5 h-5 text-muted-foreground group-hover:text-white transition-colors" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.003 5.324 5.328 0 11.859 0c3.161.001 6.132 1.23 8.367 3.465 2.235 2.235 3.461 5.207 3.46 8.367-.003 6.536-5.328 11.86-11.859 11.86h-.001c-2.01 0-3.987-.529-5.733-1.533L0 24zm6.754-4.269c1.674.993 3.324 1.52 5.093 1.522 5.348 0 9.7-4.35 9.704-9.705.002-2.595-1.01-5.035-2.85-6.877C16.92 2.83 14.48 1.817 11.86 1.817c-5.352 0-9.704 4.352-9.708 9.707-.001 1.864.502 3.689 1.459 5.291L2.616 21.41l4.195-1.679zm11.168-5.359c-.3-.15-1.774-.875-2.046-.975-.272-.1-.47-.15-.668.15-.198.3-.765.975-.939 1.175-.173.2-.347.225-.648.075-.3-.15-1.266-.467-2.41-1.485-.89-.795-1.49-1.777-1.664-2.078-.173-.3-.018-.462.13-.61.135-.133.3-.349.45-.523.15-.175.2-.299.3-.499.1-.2.05-.375-.025-.524-.075-.15-.668-1.613-.916-2.203-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.774-.726 2.022-1.429.247-.704.247-1.306.173-1.429-.074-.124-.272-.199-.572-.349z"/>
                   </svg>
-                  Download Android
+                  <span>WhatsApp</span>
                 </MagneticButton>
               </div>
 
               {/* Secondary Text Links */}
               <div className="flex flex-wrap justify-center gap-3 md:gap-6 w-full mt-2">
-                <MagneticButton as="a" href="#" className="footer-glass-pill px-6 py-3 rounded-full text-muted-foreground font-medium text-xs md:text-sm hover:text-foreground">
-                  Privacy Policy
+                <MagneticButton
+                  as="a"
+                  href="https://github.com/nmanoj10"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="footer-glass-pill px-6 py-3 rounded-full text-muted-foreground font-medium text-xs md:text-sm hover:text-foreground flex items-center gap-2"
+                >
+                  <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                    <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.167 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.579.688.481C19.137 20.164 22 16.418 22 12c0-5.523-4.477-10-10-10z" />
+                  </svg>
+                  GitHub
                 </MagneticButton>
-                <MagneticButton as="a" href="#" className="footer-glass-pill px-6 py-3 rounded-full text-muted-foreground font-medium text-xs md:text-sm hover:text-foreground">
-                  Terms of Service
+                <MagneticButton
+                  as="a"
+                  href="https://www.linkedin.com/in/nagenahalli-manoj1015/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="footer-glass-pill px-6 py-3 rounded-full text-muted-foreground font-medium text-xs md:text-sm hover:text-foreground flex items-center gap-2"
+                >
+                  <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+                  </svg>
+                  LinkedIn
                 </MagneticButton>
-                <MagneticButton as="a" href="#" className="footer-glass-pill px-6 py-3 rounded-full text-muted-foreground font-medium text-xs md:text-sm hover:text-foreground">
-                  Support
+                <MagneticButton
+                  as="a"
+                  href="https://drive.google.com/file/d/1OcWopPjsY0ZQ5OL8YH5uKUQRLkTEUkyI/view"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="footer-glass-pill px-6 py-3 rounded-full text-muted-foreground font-medium text-xs md:text-sm hover:text-foreground flex items-center gap-2"
+                >
+                  <FileText className="h-4 w-4" />
+                  Resume
                 </MagneticButton>
               </div>
             </div>

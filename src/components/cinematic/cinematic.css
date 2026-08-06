@@ -17,11 +17,29 @@
 }
 
 /* Fluid editorial heading — scales with the viewport but never gets   */
-/* absurdly large on ultra-wide screens.                               */
+/* absurdly large on ultra-wide screens. The clamp floor stays small   */
+/* enough for 320px devices.                                            */
 .loader-heading {
-  font-size: clamp(2.5rem, 7vw + 1rem, 7.5rem);
-  line-height: 1.04;
+  font-size: clamp(2rem, 8vw + 0.5rem, 7.5rem);
+  line-height: 1.05;
   letter-spacing: -0.02em;
+}
+
+/* The hero fills the dynamic viewport height (mobile URL-bar aware)    */
+/* with a 100vh fallback for older browsers.                            */
+.hero-viewport {
+  height: 100vh;
+  height: 100dvh;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* The scroll cue is pure decoration; on short screens it would collide */
+/* with the hero content, so it quietly steps aside.                    */
+@media (max-height: 640px) {
+  .loader-scroll-cue {
+    display: none;
+  }
 }
 
 /* A slower, calmer drift for the ambient light layer.                 */
@@ -44,4 +62,9 @@
   .glow-layer {
     will-change: auto;
   }
+}
+
+/* Explicitly override Tailwind's .will-change-transform class after animation completes */
+.animation-complete .will-change-transform {
+  will-change: auto !important;
 }

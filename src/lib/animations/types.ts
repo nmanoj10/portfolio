@@ -24,28 +24,8 @@ export interface ExperienceElements {
   /** The big editorial heading (split into words + characters). */
   heading: HTMLElement;
 
-  /** Row containing the progress line + percentage counter. */
-  progressRow: HTMLElement;
-  /** The thin horizontal line track. */
-  progressTrack: HTMLElement;
-  /** The fill that grows left → right inside the track. */
-  progressFill: HTMLElement;
-  /** The percentage indicator that counts up with the fill. */
-  counter: HTMLElement;
-
-  /** Container holding the rotating status messages. */
-  status: HTMLElement;
-  /** Each individual status message (crossfaded in sequence). */
-  messages: HTMLElement[];
-
   /** Hero navigation bar (revealed as the loader hands off). */
   nav: HTMLElement;
-  /** Wrapper around the hero supporting content (subtitle + CTAs). */
-  subWrapper: HTMLElement;
-  /** One-line hero subtitle. */
-  subtitle: HTMLElement;
-  /** Hero call-to-action buttons. */
-  cta: HTMLElement[];
   /** Bottom "scroll" cue. */
   scrollCue: HTMLElement;
 }
