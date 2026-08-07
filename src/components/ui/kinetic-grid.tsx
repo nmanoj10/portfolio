@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
-import type { ReactNode } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
+import type { MouseEvent as ReactMouseEvent, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -17,6 +17,13 @@ interface Ripple {
   radius: number;
   opacity: number;
   born: number;
+}
+
+interface HoverWord {
+  id: number;
+  x: number;
+  y: number;
+  word: string;
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -66,10 +73,13 @@ export default function KineticGrid({
   children,
   className,
   globalColor = "default",
+  hoverWords,
 }: {
   children?: ReactNode;
   className?: string;
   globalColor?: "default" | "monochrome";
+  /** When set, a word blooms at the pointer as the cursor moves over the background. */
+  hoverWords?: string[];
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -83,6 +93,42 @@ export default function KineticGrid({
     typeof window !== "undefined" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches,
   );
+
+  // ── Hover words ──────────────────────────────────────────────────────────────
+  const [spawnedWords, setSpawnedWords] = useState<HoverWord[]>([]);
+  const wordIdxRef = useRef(0);
+  const wordIdRef = useRef(0);
+  const lastSpawnRef = useRef<Point>({ x: -9999, y: -9999 });
+  const wordTimersRef = useRef<number[]>([]);
+
+  // Blooms a word at the pointer whenever the cursor moves over the
+  // background (throttled by distance so a slow drag leaves a gentle trail).
+  const handleWrapperMouseMove = (e: ReactMouseEvent<HTMLDivElement>) => {
+    if (!hoverWords || hoverWords.length === 0 || prefersReducedRef.current) return;
+
+    // Anchor to the wrapper's local coordinates so words stay accurate even
+    // if the component is embedded in a non-full-viewport container.
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const last = lastSpawnRef.current;
+    if (Math.hypot(x - last.x, y - last.y) < 70) return;
+    lastSpawnRef.current = { x, y };
+
+    const word = hoverWords[wordIdxRef.current % hoverWords.length];
+    wordIdxRef.current += 1;
+    const id = wordIdRef.current + 1;
+    wordIdRef.current = id;
+
+    setSpawnedWords((prev) => [...prev, { id, x, y, word }]);
+
+    const timer = window.setTimeout(() => {
+      setSpawnedWords((prev) => prev.filter((w) => w.id !== id));
+      wordTimersRef.current = wordTimersRef.current.filter((t) => t !== timer);
+    }, 1500);
+    wordTimersRef.current.push(timer);
+  };
 
   // ── Warp ────────────────────────────────────────────────────────────────────
 
@@ -403,6 +449,18 @@ export default function KineticGrid({
     };
   }, [animate, draw]);
 
+  // ── Cleanup ─────────────────────────────────────────────────────────────────
+
+  useEffect(() => {
+    return () => {
+      // Read the ref at teardown: the timeout callbacks replace the array via
+      // filter, so a reference captured at mount would go stale and leak any
+      // timers spawned after the first one fired.
+      wordTimersRef.current.forEach((t) => window.clearTimeout(t));
+      wordTimersRef.current = [];
+    };
+  }, []);
+
   // ── Pause when off-screen ───────────────────────────────────────────────────
   // The hero stays mounted forever, so without this the canvas would keep
   // redrawing at 60fps even while scrolled out of view. Pause the loop when
@@ -436,6 +494,7 @@ export default function KineticGrid({
   return (
     <div
       ref={rootRef}
+      onMouseMove={handleWrapperMouseMove}
       className={cn(
         "relative w-full min-h-screen overflow-hidden",
         globalColor === "monochrome" ? "bg-[#000000]" : "bg-[#161618]",
@@ -448,6 +507,21 @@ export default function KineticGrid({
       />
 
       <div className="relative z-10 w-full h-full">{children}</div>
+
+      {/* Words that bloom at the pointer while hovering the background. */}
+      {spawnedWords.length > 0 && (
+        <div aria-hidden className="pointer-events-none absolute inset-0 z-[5] overflow-hidden">
+          {spawnedWords.map((w) => (
+            <span
+              key={w.id}
+              className="hover-word absolute select-none whitespace-nowrap text-xs font-semibold uppercase tracking-[0.3em] text-white/80"
+              style={{ left: w.x, top: w.y }}
+            >
+              {w.word}
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

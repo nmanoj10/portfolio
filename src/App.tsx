@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { CinematicLoader } from "./components/cinematic/cinematic-loader";
+import { ScannerCardStream } from "./components/ui/card";
 import { CinematicFooter } from "./components/ui/motion-footer";
 import TechStack from "./components/ui/tech";
 import { useLenis } from "./hooks/use-lenis";
@@ -37,8 +38,13 @@ function App() {
         <>
           <div className="relative z-40">
             <TechStack />
-           
           </div>
+
+          {/* Scanner card stream — drag/wheel to fling, pauses when idle. */}
+          <div className="relative z-40">
+            <ScannerCardStream showSpeed />
+          </div>
+
           <div className="animate-footer-enter relative z-40">
             <CinematicFooter />
           </div>

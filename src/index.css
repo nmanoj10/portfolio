@@ -132,6 +132,29 @@
   }
 }
 
+/* Words that bloom at the pointer over the kinetic grid background.   */
+.hover-word {
+  animation: hover-word-float 1.4s ease-out forwards;
+}
+@keyframes hover-word-float {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) translateY(10px) scale(0.85);
+  }
+  18% {
+    opacity: 1;
+    transform: translate(-50%, -50%) translateY(0) scale(1);
+  }
+  75% {
+    opacity: 1;
+    transform: translate(-50%, -50%) translateY(-4px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) translateY(-30px) scale(1.02);
+  }
+}
+
 /* Footer only fades/rises in once the cinematic loader has finished. */
 @keyframes footer-enter {
   from {

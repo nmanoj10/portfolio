@@ -157,10 +157,30 @@ export function CinematicLoader({ onComplete, finished = false }: CinematicLoade
       <LoaderBackdrop ref={backdropRef} />
 
       {/* Interactive kinetic-grid background — warps toward the pointer,
-          ripples on click. Fades in with the loader sequence. */}
+          ripples on click, blooms tech words under the cursor. Fades in
+          with the loader sequence. */}
       <KineticGrid
         globalColor="monochrome"
         className="kinetic-bg absolute inset-0 z-0 min-h-0"
+        hoverWords={[
+          "HTML",
+          "CSS",
+          "JavaScript",
+          "TypeScript",
+          "React",
+          "Node.js",
+          "Express",
+          "MongoDB",
+          "SQL",
+          "Tailwind",
+          "Astro",
+          "Vite",
+          "Docker",
+          "AWS",
+          "Python",
+          "Git",
+          "Figma",
+        ]}
       />
 
       {/* ---------- Hero navigation ---------- */}
