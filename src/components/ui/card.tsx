@@ -13,11 +13,20 @@ const defaultCardImages = [
   "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=800&q=80",
 ];
 
-// Card dimensions (kept in sync with the Tailwind classes in the JSX below).
+// Desktop-ish card size. Cards shrink to a fluid fraction of the section
+// width below ~470px so the stream always fits phones and tablets.
 const CARD_WIDTH = 400;
 const CARD_HEIGHT = 250;
-const ASCII_COLS = Math.floor(CARD_WIDTH / 6.5);
-const ASCII_ROWS = Math.floor(CARD_HEIGHT / 13);
+
+/** Scales the card down on narrow viewports. Quantized to 12px steps so
+    window drags don't rebuild the Three.js scene on every 2px of width. */
+const computeCardDims = (sectionWidth: number) => {
+  const width =
+    Math.floor(Math.min(CARD_WIDTH, Math.max(200, sectionWidth * 0.85)) / 12) *
+    12;
+  const height = Math.round(width * (CARD_HEIGHT / CARD_WIDTH));
+  return { width, height };
+};
 
 // ─── ASCII code generator ─────────────────────────────────────────────────────
 const ASCII_CHARS =
@@ -75,14 +84,26 @@ const ScannerCardStream = ({
   const [isPaused, setIsPaused] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
 
+  // Fluid card size — tracks the section width so cards fit every screen.
+  const [cardDims, setCardDims] = useState(() =>
+    computeCardDims(
+      typeof window === "undefined" ? CARD_WIDTH : window.innerWidth,
+    ),
+  );
+
+  // The ASCII grid derives from the live card size so it never overflows.
+  const asciiCols = Math.max(10, Math.floor(cardDims.width / 6.5));
+  const asciiRows = Math.max(5, Math.floor(cardDims.height / 13));
+  const cardGapPx = Math.min(cardGap, Math.round(cardDims.width * 0.15));
+
   const cards = useMemo(
     () =>
       Array.from({ length: cardImages.length * repeat }, (_, i) => ({
         id: i,
         image: cardImages[i % cardImages.length],
-        ascii: generateCode(ASCII_COLS, ASCII_ROWS),
+        ascii: generateCode(asciiCols, asciiRows),
       })),
-    [cardImages, repeat],
+    [cardImages, repeat, asciiCols, asciiRows],
   );
 
   const sectionRef = useRef<HTMLElement>(null);
@@ -145,14 +166,35 @@ const ScannerCardStream = ({
     return () => observer.disconnect();
   }, []);
 
+  // Re-measure on resize so the card size stays fluid (phone → desktop).
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+    const syncSize = () => {
+      setCardDims((prev) => {
+        const next = computeCardDims(section.clientWidth);
+        return prev.width === next.width && prev.height === next.height
+          ? prev
+          : next;
+      });
+    };
+    syncSize();
+    const observer = new ResizeObserver(syncSize);
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, []);
+
   useEffect(() => {
     const cardLine = cardLineRef.current;
     const particleCanvas = particleCanvasRef.current;
     const scannerCanvas = scannerCanvasRef.current;
     if (!cardLine || !particleCanvas || !scannerCanvas) return;
 
-    originalAscii.current.clear();
-    cards.forEach((card) => originalAscii.current.set(card.id, card.ascii));
+    // Capture the map ref so cleanup (and scramble restore) never touches
+    // the live ref — it gets cleared/refilled on the next effect run.
+    const asciiMap = originalAscii.current;
+    asciiMap.clear();
+    cards.forEach((card) => asciiMap.set(card.id, card.ascii));
 
     // The card strip is stable for the effect's lifetime, so cache the
     // wrappers once instead of re-querying the DOM every frame.
@@ -163,11 +205,12 @@ const ScannerCardStream = ({
 
     // --- Three.js dust particles drifting behind the cards ---
     const scene = new THREE.Scene();
+    const cardHeight = cardDims.height;
     const camera = new THREE.OrthographicCamera(
       -viewWidth / 2,
       viewWidth / 2,
-      125,
-      -125,
+      cardHeight / 2,
+      -cardHeight / 2,
       1,
       1000,
     );
@@ -177,10 +220,12 @@ const ScannerCardStream = ({
       alpha: true,
       antialias: true,
     });
-    renderer.setSize(viewWidth, CARD_HEIGHT);
+    renderer.setSize(viewWidth, cardHeight);
     renderer.setClearColor(0x000000, 0);
 
-    const particleCount = 400;
+    // Fewer particles on small screens keeps low-end phones smooth.
+    const isCompact = viewWidth < 640;
+    const particleCount = isCompact ? 200 : 400;
     const geometry = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
     const velocities = new Float32Array(particleCount);
@@ -203,7 +248,7 @@ const ScannerCardStream = ({
 
     for (let i = 0; i < particleCount; i++) {
       positions[i * 3] = (Math.random() - 0.5) * viewWidth * 2;
-      positions[i * 3 + 1] = (Math.random() - 0.5) * CARD_HEIGHT;
+      positions[i * 3 + 1] = (Math.random() - 0.5) * cardHeight;
       velocities[i] = Math.random() * 60 + 30;
       alphas[i] = (Math.random() * 8 + 2) / 10;
     }
@@ -225,11 +270,11 @@ const ScannerCardStream = ({
 
     // --- 2D scanner particles (swell when a card is being scanned) ---
     const ctx = scannerCanvas.getContext("2d")!;
-    scannerCanvas.width = window.innerWidth;
-    scannerCanvas.height = CARD_HEIGHT + 50;
+    scannerCanvas.width = viewWidth;
+    scannerCanvas.height = cardHeight + 50;
     let scannerParticles: ScannerParticle[] = [];
-    const baseMaxParticles = 800;
-    const scanTargetMaxParticles = 2500;
+    const baseMaxParticles = isCompact ? 400 : 800;
+    const scanTargetMaxParticles = isCompact ? 1200 : 2500;
     let currentMaxParticles = baseMaxParticles;
 
     const createScannerParticle = (): ScannerParticle => ({
@@ -251,11 +296,11 @@ const ScannerCardStream = ({
     const runScrambleEffect = (element: HTMLElement, cardId: number) => {
       if (element.dataset.scrambling === "true") return;
       element.dataset.scrambling = "true";
-      const originalText = originalAscii.current.get(cardId) ?? "";
+      const originalText = asciiMap.get(cardId) ?? "";
       let scrambleCount = 0;
       const maxScrambles = 10;
       const interval = window.setInterval(() => {
-        element.textContent = generateCode(ASCII_COLS, ASCII_ROWS);
+        element.textContent = generateCode(asciiCols, asciiRows);
         scrambleCount++;
         if (scrambleCount >= maxScrambles) {
           window.clearInterval(interval);
@@ -275,42 +320,42 @@ const ScannerCardStream = ({
       let anyCardIsScanning = false;
 
       cardWrappers.forEach((wrapper, index) => {
-          const rect = wrapper.getBoundingClientRect();
-          const normalCard = wrapper.querySelector<HTMLElement>(".card-normal");
-          const asciiCard = wrapper.querySelector<HTMLElement>(".card-ascii");
-          if (!normalCard || !asciiCard) return;
+        const rect = wrapper.getBoundingClientRect();
+        const normalCard = wrapper.querySelector<HTMLElement>(".card-normal");
+        const asciiCard = wrapper.querySelector<HTMLElement>(".card-ascii");
+        if (!normalCard || !asciiCard) return;
 
-          if (rect.left < scannerRight && rect.right > scannerLeft) {
-            anyCardIsScanning = true;
-            if (
-              scanEffectRef.current === "scramble" &&
-              wrapper.dataset.scanned !== "true"
-            ) {
-              const asciiContent = asciiCard.querySelector<HTMLElement>("pre");
-              if (asciiContent) runScrambleEffect(asciiContent, index);
-            }
-            wrapper.dataset.scanned = "true";
-            const intersectLeft = Math.max(scannerLeft - rect.left, 0);
-            const intersectRight = Math.min(scannerRight - rect.left, rect.width);
-            normalCard.style.setProperty(
-              "--clip-right",
-              `${(intersectLeft / rect.width) * 100}%`,
-            );
-            asciiCard.style.setProperty(
-              "--clip-left",
-              `${(intersectRight / rect.width) * 100}%`,
-            );
-          } else {
-            delete wrapper.dataset.scanned;
-            if (rect.right < scannerLeft) {
-              normalCard.style.setProperty("--clip-right", "100%");
-              asciiCard.style.setProperty("--clip-left", "100%");
-            } else {
-              normalCard.style.setProperty("--clip-right", "0%");
-              asciiCard.style.setProperty("--clip-left", "0%");
-            }
+        if (rect.left < scannerRight && rect.right > scannerLeft) {
+          anyCardIsScanning = true;
+          if (
+            scanEffectRef.current === "scramble" &&
+            wrapper.dataset.scanned !== "true"
+          ) {
+            const asciiContent = asciiCard.querySelector<HTMLElement>("pre");
+            if (asciiContent) runScrambleEffect(asciiContent, index);
           }
-        });
+          wrapper.dataset.scanned = "true";
+          const intersectLeft = Math.max(scannerLeft - rect.left, 0);
+          const intersectRight = Math.min(scannerRight - rect.left, rect.width);
+          normalCard.style.setProperty(
+            "--clip-right",
+            `${(intersectLeft / rect.width) * 100}%`,
+          );
+          asciiCard.style.setProperty(
+            "--clip-left",
+            `${(intersectRight / rect.width) * 100}%`,
+          );
+        } else {
+          delete wrapper.dataset.scanned;
+          if (rect.right < scannerLeft) {
+            normalCard.style.setProperty("--clip-right", "100%");
+            asciiCard.style.setProperty("--clip-left", "100%");
+          } else {
+            normalCard.style.setProperty("--clip-right", "0%");
+            asciiCard.style.setProperty("--clip-left", "0%");
+          }
+        }
+      });
 
       if (anyCardIsScanning !== isScanningRef.current) {
         isScanningRef.current = anyCardIsScanning;
@@ -451,16 +496,25 @@ const ScannerCardStream = ({
       window.removeEventListener("touchend", handleMouseUp);
       cardLine.removeEventListener("wheel", handleWheel);
       scrambleIntervals.forEach((interval) => window.clearInterval(interval));
+      // Restore any card caught mid-scramble, so a resize/rotation can't
+      // leave it stuck scrambled with a stale data-scrambling flag.
+      cardWrappers.forEach((wrapper, index) => {
+        const pre = wrapper.querySelector<HTMLElement>("pre");
+        if (pre && pre.dataset.scrambling === "true") {
+          pre.textContent = asciiMap.get(index) ?? "";
+          delete pre.dataset.scrambling;
+        }
+      });
       geometry.dispose();
       material.dispose();
       texture.dispose();
       renderer.dispose();
       ctx.clearRect(0, 0, scannerCanvas.width, scannerCanvas.height);
     };
-  }, [cards]);
+  }, [cards, cardDims, asciiCols, asciiRows]);
 
   return (
-    <main ref={sectionRef} className="relative flex h-screen w-full items-center justify-center overflow-hidden">
+    <main ref={sectionRef} className="relative flex h-screen w-full items-center justify-center overflow-hidden supports-[height:100dvh]:h-dvh">
       {/* Component-scoped keyframes (plain <style> — no styled-jsx needed). */}
       <style>{`
         @keyframes scanner-card-glitch {
@@ -483,7 +537,7 @@ const ScannerCardStream = ({
 
       {/* Speed indicator */}
       {showSpeed && (
-        <div className="absolute right-6 top-6 z-30 flex items-center gap-2 rounded-full border border-white/10 bg-black/50 px-4 py-2 font-mono text-xs text-white/80 backdrop-blur-md">
+        <div className="absolute right-4 top-4 z-30 flex items-center gap-1.5 rounded-full border border-white/10 bg-black/50 px-3 py-1.5 font-mono text-[10px] text-white/80 backdrop-blur-md sm:right-6 sm:top-6 sm:gap-2 sm:px-4 sm:py-2 sm:text-xs">
           <Gauge className="h-3.5 w-3.5 text-violet-400" />
           {speed} px/s
         </div>
@@ -492,19 +546,22 @@ const ScannerCardStream = ({
       {/* Floating dust backdrop (Three.js) */}
       <canvas
         ref={particleCanvasRef}
-        className="pointer-events-none absolute left-0 top-1/2 z-0 h-[250px] w-full -translate-y-1/2"
+        className="pointer-events-none absolute left-0 top-1/2 z-0 w-full -translate-y-1/2"
+        style={{ height: `${cardDims.height}px` }}
       />
 
       {/* Scanner particles (2D canvas) */}
       <canvas
         ref={scannerCanvasRef}
-        className="pointer-events-none absolute left-0 top-1/2 z-10 h-[300px] w-full -translate-y-1/2"
+        className="pointer-events-none absolute left-0 top-1/2 z-10 w-full -translate-y-1/2"
+        style={{ height: `${cardDims.height + 50}px` }}
       />
 
       {/* The scanner line itself */}
       <div
-        className={`scanner-card-pulse absolute left-1/2 top-1/2 z-20 h-[280px] w-0.5 rounded-full bg-gradient-to-b from-transparent via-violet-500 to-transparent transition-opacity duration-300 ${isScanning ? "opacity-100" : "opacity-0"}`}
+        className={`scanner-card-pulse absolute left-1/2 top-1/2 z-20 w-0.5 rounded-full bg-gradient-to-b from-transparent via-violet-500 to-transparent transition-opacity duration-300 ${isScanning ? "opacity-100" : "opacity-0"}`}
         style={{
+          height: `${cardDims.height + 30}px`,
           boxShadow:
             "0 0 10px #a78bfa, 0 0 20px #a78bfa, 0 0 30px #8b5cf6, 0 0 50px #6366f1",
         }}
@@ -512,16 +569,20 @@ const ScannerCardStream = ({
       />
 
       {/* The card stream */}
-      <div className="absolute flex h-[250px] w-full items-center">
+      <div
+        className="absolute flex w-full items-center"
+        style={{ height: `${cardDims.height}px` }}
+      >
         <div
           ref={cardLineRef}
-          className="flex cursor-grab select-none items-center whitespace-nowrap will-change-transform active:cursor-grabbing"
-          style={{ gap: `${cardGap}px` }}
+          className="flex cursor-grab touch-pan-y select-none items-center whitespace-nowrap will-change-transform active:cursor-grabbing"
+          style={{ gap: `${cardGapPx}px` }}
         >
           {cards.map((card) => (
             <div
               key={card.id}
-              className="card-wrapper relative h-[250px] w-[400px] shrink-0"
+              className="card-wrapper relative shrink-0"
+              style={{ width: cardDims.width, height: cardDims.height }}
             >
               {/* Image side (revealed to the right of the scanner) */}
               <div className="card-normal absolute left-0 top-0 z-[2] h-full w-full overflow-hidden rounded-[15px] bg-transparent shadow-[0_15px_40px_rgba(0,0,0,0.4)] [clip-path:inset(0_0_0_var(--clip-right,0%))]">
@@ -546,12 +607,12 @@ const ScannerCardStream = ({
 
       {/* Controls */}
       {showControls && (
-        <div className="absolute bottom-8 left-1/2 z-30 flex -translate-x-1/2 items-center gap-1 rounded-full border border-white/10 bg-black/40 p-1.5 backdrop-blur-md">
+        <div className="absolute bottom-6 left-1/2 z-30 flex -translate-x-1/2 items-center gap-1 rounded-full border border-white/10 bg-black/40 p-1.5 backdrop-blur-md sm:bottom-8">
           <button
             type="button"
             onClick={toggleAnimation}
             aria-label={isPaused ? "Play" : "Pause"}
-            className="rounded-full p-2.5 text-white/80 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-400"
+            className="rounded-full p-3 text-white/80 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-400 sm:p-2.5"
           >
             {isPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
           </button>
@@ -559,7 +620,7 @@ const ScannerCardStream = ({
             type="button"
             onClick={changeDirection}
             aria-label="Reverse direction"
-            className="rounded-full p-2.5 text-white/80 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-400"
+            className="rounded-full p-3 text-white/80 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-400 sm:p-2.5"
           >
             <ArrowLeftRight className="h-4 w-4" />
           </button>
@@ -567,7 +628,7 @@ const ScannerCardStream = ({
             type="button"
             onClick={resetPosition}
             aria-label="Reset position"
-            className="rounded-full p-2.5 text-white/80 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-400"
+            className="rounded-full p-3 text-white/80 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-400 sm:p-2.5"
           >
             <RotateCcw className="h-4 w-4" />
           </button>

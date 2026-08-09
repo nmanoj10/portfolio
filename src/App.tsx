@@ -38,6 +38,8 @@ function App() {
         <>
           <div className="relative z-40">
             <TechStack />
+
+            
           </div>
 
           {/* Scanner card stream — drag/wheel to fling, pauses when idle. */}
