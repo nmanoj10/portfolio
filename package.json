@@ -12,6 +12,8 @@
   "dependencies": {
     "@fontsource-variable/geist": "^5.3.0",
     "@gsap/react": "^2.1.2",
+    "@splinetool/react-spline": "^4.1.0",
+    "@splinetool/runtime": "^1.12.98",
     "@tailwindcss/vite": "^4.3.3",
     "@types/three": "^0.185.4",
     "class-variance-authority": "^0.7.1",

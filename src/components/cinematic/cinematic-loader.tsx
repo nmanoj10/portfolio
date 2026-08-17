@@ -188,7 +188,7 @@ export function CinematicLoader({ onComplete, finished = false }: CinematicLoade
         ref={navRef}
         className="absolute inset-x-0 top-0 z-20 flex items-center justify-between px-6 py-6 opacity-0 md:px-12 md:py-8"
       >
-        <span className="text-xs font-semibold uppercase tracking-[0.35em] text-white md:text-sm">
+        <span className="text-sm font-semibold uppercase tracking-[0.35em] text-white md:text-base">
           Manoj
         </span>
         <div className="hidden items-center gap-8 sm:flex">
@@ -196,7 +196,7 @@ export function CinematicLoader({ onComplete, finished = false }: CinematicLoade
             <a
               key={label}
               href="#"
-              className="text-[11px] uppercase tracking-[0.25em] text-neutral-400 transition-colors hover:text-white"
+              className="text-xs uppercase tracking-[0.25em] text-neutral-400 transition-colors hover:text-white"
             >
               {label}
             </a>
@@ -209,7 +209,7 @@ export function CinematicLoader({ onComplete, finished = false }: CinematicLoade
         {/* Eyebrow label */}
         <p
           ref={eyebrowRef}
-          className="mb-8 text-[10px] font-medium uppercase tracking-[0.4em] text-neutral-500 opacity-0 md:mb-12"
+          className="mb-8 text-xs font-medium uppercase tracking-[0.4em] text-neutral-200 opacity-0 sm:text-sm md:mb-12"
         >
           Manoj — Digital Portfolio
         </p>

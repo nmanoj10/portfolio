@@ -91,7 +91,7 @@ const Icon = ({
     >
       {/* Inner wrapper for the continuous floating animation */}
       <motion.div
-        className="flex items-center justify-center w-16 h-16 md:w-20 md:h-20 p-3 rounded-3xl shadow-xl bg-card/80 backdrop-blur-md border border-border/10"
+        className="flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 p-2 sm:p-3 rounded-3xl shadow-xl bg-card/80 backdrop-blur-md border border-border/10"
         animate={{
           y: [0, -8, 0, 8, 0],
           x: [0, 6, 0, -6, 0],
@@ -104,7 +104,7 @@ const Icon = ({
           ease: "easeInOut",
         }}
       >
-        <iconData.icon className="w-8 h-8 md:w-10 md:h-10 text-foreground" />
+        <iconData.icon className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 text-foreground" />
       </motion.div>
     </motion.div>
   )
@@ -128,7 +128,7 @@ const FloatingIconsHero = React.forwardRef<
       ref={ref}
       onMouseMove={handleMouseMove}
       className={cn(
-        "relative w-full h-screen min-h-[700px] flex items-center justify-center overflow-hidden bg-background",
+        "relative w-full h-screen supports-[height:100dvh]:h-dvh min-h-[520px] flex items-center justify-center overflow-hidden bg-background",
         className
       )}
       {...props}
@@ -148,10 +148,10 @@ const FloatingIconsHero = React.forwardRef<
 
       {/* Container for the foreground content */}
       <div className="relative z-10 text-center px-4">
-        <h1 className="text-5xl md:text-7xl font-bold tracking-tight bg-gradient-to-b from-foreground to-foreground/70 text-transparent bg-clip-text">
+        <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight bg-gradient-to-b from-foreground to-foreground/70 text-transparent bg-clip-text">
           Tools Behind Every Project
         </h1>
-        <p className="mt-6 max-w-xl mx-auto text-lg text-muted-foreground">
+        <p className="mt-6 max-w-xl mx-auto text-base sm:text-lg text-muted-foreground">
          From backend architecture to AI integration, every tool in my stack is chosen to solve real-world problems.
         </p>
         <div className="mt-10">

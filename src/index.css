@@ -114,6 +114,31 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+/* Grid background utilities (used by background-grid-beam.tsx).
+   - bg-grid: theme-adaptive faint grid for the GridBeam wrapper
+   - bg-grid-black / bg-grid-white: colorable via /opacity modifier, e.g.
+     bg-grid-white/[0.05] */
+@utility bg-grid {
+  background-image:
+    linear-gradient(to right, color-mix(in oklch, var(--foreground) 10%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklch, var(--foreground) 10%, transparent) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+@utility bg-grid-black {
+  background-image:
+    linear-gradient(to right, color-mix(in srgb, black calc(var(--modifier, 1) * 100%), transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, black calc(var(--modifier, 1) * 100%), transparent) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+@utility bg-grid-white {
+  background-image:
+    linear-gradient(to right, color-mix(in srgb, white calc(var(--modifier, 1) * 100%), transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, white calc(var(--modifier, 1) * 100%), transparent) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
