@@ -4,6 +4,24 @@ import { RadialScrollGallery } from "@/components/ui/portfolio-and-image-gallery
 import { ArrowUpRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
+/**
+ * "Projects" wheel title — mirrors the footer heading's font (Plus Jakarta
+ * Sans) and metallic gradient glow (see motion-footer.tsx `.footer-text-glow`).
+ */
+const PROJECTS_TITLE_STYLE = `
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap');
+
+.projects-wheel-title {
+  font-family: 'Plus Jakarta Sans', 'Geist Variable', sans-serif;
+  background: linear-gradient(180deg, var(--foreground) 0%, color-mix(in oklch, var(--foreground) 40%, transparent) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  filter: drop-shadow(0px 0px 20px color-mix(in oklch, var(--foreground) 15%, transparent));
+}
+`;
+
 const projects = [
   {
     id: 1,
@@ -40,16 +58,9 @@ const projects = [
 export default function DemoRadialScrollGalleryBento() {
   return (
     <div className="bg-background min-h-[70svh] text-foreground overflow-hidden rounded-lg border w-full sm:min-h-[600px]">
-      <div className="h-[160px] flex flex-col items-center justify-center space-y-4 pt-8 sm:h-[220px]">
-        <div className="space-y-1 text-center">
-          <span className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase">
-           
-          </span>
-          <h1 className="text-4xl font-bold tracking-tighter"></h1>
-        </div>
-       
-      </div>
+      <style>{PROJECTS_TITLE_STYLE}</style>
 
+      <div className="relative">
       <RadialScrollGallery
         className="min-h-[70svh]! sm:min-h-[600px]!"
         baseRadius={600}
@@ -63,7 +74,7 @@ export default function DemoRadialScrollGalleryBento() {
             return (
               <div
                 key={project.id}
-                className="group relative w-[min(46vw,200px)] aspect-[5/7] overflow-hidden rounded-xl bg-card border border-border shadow-lg sm:w-[240px] sm:aspect-[3/4]"
+                className="group relative w-[min(52vw,240px)] aspect-[5/7] overflow-hidden rounded-xl bg-card border border-border shadow-lg sm:w-[280px] sm:aspect-[3/4]"
               >
                 <div className="absolute inset-0 overflow-hidden">
                   <img
@@ -118,7 +129,13 @@ export default function DemoRadialScrollGalleryBento() {
         }
       </RadialScrollGallery>
 
-      
+        {/* "Projects" centered in the wheel, styled like the footer heading. */}
+        <div className="pointer-events-none absolute inset-x-0 top-1/2 z-20 -translate-y-1/2 flex justify-center px-4">
+          <h2 className="projects-wheel-title text-center text-5xl font-black tracking-tighter sm:text-7xl md:text-8xl">
+            Projects
+          </h2>
+        </div>
+      </div>
     </div>
   );
 }
