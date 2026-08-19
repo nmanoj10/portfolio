@@ -184,6 +184,7 @@ export function CinematicLoader({ onComplete, finished = false }: CinematicLoade
       />
 
       {/* ---------- Hero navigation ---------- */}
+      {!finished && (
       <nav
         ref={navRef}
         className="absolute inset-x-0 top-0 z-20 flex items-center justify-between px-6 py-6 opacity-0 md:px-12 md:py-8"
@@ -192,17 +193,18 @@ export function CinematicLoader({ onComplete, finished = false }: CinematicLoade
           Manoj
         </span>
         <div className="hidden items-center gap-8 sm:flex">
-          {["Work", "About", "Contact"].map((label) => (
+          {[{ label: "Work", href: "#work" }, { label: "About", href: "#about" }, { label: "Contact", href: "#contact" }].map((item) => (
             <a
-              key={label}
-              href="#"
+              key={item.label}
+              href={item.href}
               className="text-xs uppercase tracking-[0.25em] text-neutral-400 transition-colors hover:text-white"
             >
-              {label}
+              {item.label}
             </a>
           ))}
         </div>
       </nav>
+      )}
 
       {/* ---------- Center content: loader UI + hero copy ---------- */}
       <div className="no-scrollbar relative z-10 flex max-h-full w-full max-w-5xl flex-col items-center justify-center overflow-y-auto px-6 py-16 lg:py-24">

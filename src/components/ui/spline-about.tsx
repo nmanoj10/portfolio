@@ -15,15 +15,15 @@ export function SplineAboutSection() {
       <Card className="relative w-full overflow-hidden rounded-none border-x-0 border-t-0 bg-black/[0.96]">
         <Spotlight className="-top-40 left-0 md:left-60 md:-top-20" />
 
-        <div className="flex min-h-[75svh] flex-col md:min-h-[620px] md:flex-row">
+        <div className="flex min-h-screen flex-col md:flex-row">
           {/* Left content */}
-          <div className="relative z-10 flex flex-1 flex-col justify-center p-8 sm:p-12 md:p-16">
+          <div className="relative z-10 flex flex-1 flex-col justify-center p-8 pl-12 sm:p-12 sm:pl-20 md:p-16 md:pl-28">
             <p className="mb-6 text-xs font-medium uppercase tracking-[0.4em] text-neutral-200 sm:text-sm">
-              About Me
+              GET TO KNOW ME
             </p>
 
             <h1 className="max-w-xl bg-gradient-to-b from-neutral-50 to-neutral-400 bg-clip-text text-4xl font-bold leading-tight tracking-tight text-transparent sm:text-5xl">
-              Backend engineering, creative execution.
+              Full stack developer, creative execution.
             </h1>
 
             <p className="mt-6 max-w-lg text-base leading-relaxed text-neutral-300 sm:text-lg">
